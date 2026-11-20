@@ -1,0 +1,66 @@
+# ============================================================================
+# .gitignore — 인터랙티브 시뮬레이션 교수학습 페이지 (GitHub Pages + Supabase)
+# ============================================================================
+
+# 1. 환경 변수 및 민감 설정 (절대 커밋 금지)
+.env
+.env.*
+!.env.example
+config.local.js
+*.pem
+*.key
+secrets.json
+
+# 2. Supabase CLI 로컬 임시/브랜치 데이터
+supabase/.branches/
+supabase/.temp/
+.supabase/
+
+# 3. Node.js / 패키지 매니저 (로컬 검증·빌드 도구 사용 시)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# 4. Python / Jupyter 노트북 임시 파일
+__pycache__/
+*.py[cod]
+*$py.class
+.ipynb_checkpoints/
+.pytest_cache/
+.venv/
+venv/
+ENV/
+
+# 5. 에디터 및 IDE 설정
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.sublime-project
+*.sublime-workspace
+
+# 6. 운영체제 생성 파일 (Windows / macOS / Linux)
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# 7. 로그, 캐시 및 임시 산출물
+logs/
+*.log
+.cache/
+dist/
+build/
+tmp/
+temp/
+coverage/

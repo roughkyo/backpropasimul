@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>M5. 역전파 한 걸음씩 — 인터랙티브 시뮬레이션</title>
+    <link rel="stylesheet" href="./css/style.css" />
+  </head>
+  <body>
+    <div class="scroll-progress-track" aria-hidden="true">
+      <div class="scroll-progress-bar" id="scroll-progress-bar"></div>
+    </div>
+
+    <header class="app-header">
+      <div class="header-left">
+        <a href="#sec-hero" class="brand-dot" aria-label="맨 위로"></a>
+        <h1 class="app-title" id="app-title">1차시 딥러닝 — M5. 역전파 한 걸음씩</h1>
+        <span class="progress-badge" id="header-progress-badge">진행 0/3</span>
+      </div>
+      <div class="header-right">
+        <span class="submit-status-chip" id="header-submit-status">자동 저장 중</span>
+        <div class="theme-switch" role="group" aria-label="화면 테마 선택">
+          <button type="button" class="theme-opt is-active" id="theme-light-btn" data-set-theme="light">화이트</button>
+          <button type="button" class="theme-opt" id="theme-dark-btn" data-set-theme="dark">다크</button>
+        </div>
+        <button type="button" class="btn btn-ghost btn-sm" id="toggle-present-btn">발표 모드</button>
+        <button type="button" class="btn btn-primary btn-sm" id="header-submit-btn">기록 제출</button>
+      </div>
+    </header>
+
+    <main id="app-root"></main>
+
+    <!-- 학생 작업 기록 제출 모달 (학번 · 이름 · 비밀번호) -->
+    <div class="modal-backdrop" id="submit-modal-backdrop" hidden>
+      <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="submit-modal-title">
+        <div class="modal-header">
+          <h3 id="submit-modal-title">작업 기록 제출하기</h3>
+          <button type="button" class="btn btn-ghost btn-sm" data-close-submit-modal aria-label="닫기">✕</button>
+        </div>
+
+        <div class="summary-grid" id="submit-summary-box"></div>
+
+        <form id="submit-form">
+          <label class="form-field">
+            <span>학번</span>
+            <input type="text" id="submit-student-id" class="text-input" placeholder="예: 10215" maxlength="30" required />
+          </label>
+          <label class="form-field">
+            <span>이름</span>
+            <input type="text" id="submit-student-name" class="text-input" placeholder="예: 김지민" maxlength="40" required />
+          </label>
+          <label class="form-field">
+            <span>비밀번호 (본인 확인 · 재제출용, 4자 이상)</span>
+            <input type="password" id="submit-password" class="text-input" placeholder="4자리 이상 숫자 또는 문자" minlength="4" maxlength="32" required />
+          </label>
+
+          <p class="modal-note" id="submit-mode-note"></p>
+          <div class="submit-status" id="submit-status-msg" hidden aria-live="polite"></div>
+
+          <div class="modal-actions">
+            <button type="button" class="btn btn-ghost" data-close-submit-modal>취소</button>
+            <button type="submit" class="btn btn-primary" id="submit-confirm-btn">작업 기록 제출</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <script type="module" src="./js/main.js"></script>
+  </body>
+</html>

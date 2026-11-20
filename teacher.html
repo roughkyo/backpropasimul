@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>교사용 제출 기록 확인 — 인터랙티브 시뮬레이션</title>
+    <link rel="stylesheet" href="./css/style.css" />
+    <style>
+      .teacher-wrap {
+        max-width: 1220px;
+        margin: 86px auto 40px;
+        padding: 0 24px 40px;
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+      }
+      .teacher-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 18px;
+        box-shadow: var(--shadow-sm);
+      }
+      .login-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr auto;
+        gap: 10px;
+        align-items: end;
+      }
+      @media (max-width: 720px) {
+        .login-row {
+          grid-template-columns: 1fr;
+        }
+      }
+      .toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-bottom: 12px;
+      }
+      .table-wrap {
+        overflow-x: auto;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.86rem;
+      }
+      th,
+      td {
+        padding: 10px 8px;
+        border-bottom: 1px solid var(--border);
+        text-align: left;
+        vertical-align: top;
+      }
+      th {
+        background: var(--surface-subtle);
+        font-weight: 700;
+      }
+      .mono {
+        font-variant-numeric: tabular-nums;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="app-header">
+      <div class="header-left">
+        <h1 class="app-title">교사용 학생 작업 기록 확인</h1>
+        <span class="progress-badge" id="teacher-lesson-badge">-</span>
+      </div>
+      <div class="header-right">
+        <a class="btn btn-ghost btn-sm" href="./index.html">학생 페이지로</a>
+      </div>
+    </header>
+
+    <main class="teacher-wrap">
+      <section class="teacher-card" id="teacher-auth-card">
+        <h2 style="margin: 0 0 8px; font-size: 1rem">교사 로그인 (Supabase Auth)</h2>
+        <p style="margin: 0 0 12px; font-size: 0.84rem; color: var(--text-muted)" id="teacher-mode-desc"></p>
+        <form id="teacher-login-form" class="login-row">
+          <label class="form-field" style="margin: 0">
+            <span>교사 이메일</span>
+            <input type="email" id="teacher-email" class="text-input" placeholder="teacher@school.kr" required />
+          </label>
+          <label class="form-field" style="margin: 0">
+            <span>비밀번호</span>
+            <input type="password" id="teacher-pw" class="text-input" required />
+          </label>
+          <button type="submit" class="btn btn-primary" id="teacher-login-btn">로그인 및 조회</button>
+        </form>
+        <div class="submit-status" id="teacher-auth-msg" hidden></div>
+      </section>
+
+      <section class="teacher-card" id="teacher-list-card" hidden>
+        <div class="toolbar">
+          <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap">
+            <input type="text" id="filter-search" class="text-input" style="width: 220px" placeholder="학번 또는 이름 검색" />
+            <span id="row-count-label" style="font-size: 0.84rem; color: var(--text-muted)">0명</span>
+          </div>
+          <div style="display: flex; gap: 8px">
+            <button type="button" class="btn btn-secondary btn-sm" id="refresh-btn">새로고침</button>
+            <button type="button" class="btn btn-primary btn-sm" id="export-csv-btn">CSV 다운로드 (UTF-8)</button>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>학번</th>
+                <th>이름</th>
+                <th>제출 횟수</th>
+                <th>예측 선택</th>
+                <th>미션 달성</th>
+                <th>확인 체크</th>
+                <th>생각 질문</th>
+                <th>체류(초)</th>
+                <th>최종 제출 시각</th>
+              </tr>
+            </thead>
+            <tbody id="submissions-tbody"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <script type="module">
+      import { APP_CONFIG } from './config.js';
+      import {
+        fetchTeacherSubmissions,
+        isSupabaseConfigured,
+        teacherSignIn,
+      } from './js/core/storage.js';
+      import { formatKoreaTime } from './js/core/ui.js';
+
+      document.getElementById('teacher-lesson-badge').textContent = APP_CONFIG.lessonId;
+      const modeDesc = document.getElementById('teacher-mode-desc');
+      const authCard = document.getElementById('teacher-auth-card');
+      const listCard = document.getElementById('teacher-list-card');
+      const authMsg = document.getElementById('teacher-auth-msg');
+      const tbody = document.getElementById('submissions-tbody');
+      const searchInput = document.getElementById('filter-search');
+      const countLabel = document.getElementById('row-count-label');
+
+      let accessToken = '';
+      let rows = [];
+
+      function summarizeRow(r) {
+        const m5 = r.payload?.modules?.m5 || {};
+        const pred = m5.prediction?.choiceLabel || '-';
+        const missions = Object.values(m5.missions || {}).filter(Boolean).length;
+        const checks = Object.values(m5.checks || {});
+        const correct = checks.filter((c) => c?.correct).length;
+        const reflection = (m5.reflection || '').trim() || '-';
+        const duration = r.payload?.durationSec ?? '-';
+        return { pred, missions: `${missions}/2`, checks: `${correct}/2`, reflection, duration };
+      }
+
+      function renderTable() {
+        const q = searchInput.value.trim().toLowerCase();
+        const filtered = rows.filter((r) => {
+          if (!q) return true;
+          return (
+            String(r.student_id || '').toLowerCase().includes(q) ||
+            String(r.student_name || '').toLowerCase().includes(q)
+          );
+        });
+        countLabel.textContent = `총 ${filtered.length}명`;
+        if (filtered.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:var(--text-muted)">제출된 기록이 없습니다.</td></tr>';
+          return;
+        }
+        tbody.innerHTML = filtered
+          .map((r) => {
+            const s = summarizeRow(r);
+            return `
+              <tr>
+                <td class="mono"><strong>${r.student_id}</strong></td>
+                <td>${r.student_name}</td>
+                <td class="mono">${r.submit_count || 1}회</td>
+                <td>${s.pred}</td>
+                <td class="mono">${s.missions}</td>
+                <td class="mono">${s.checks}</td>
+                <td>${s.reflection}</td>
+                <td class="mono">${s.duration}</td>
+                <td class="mono">${formatKoreaTime(r.updated_at)}</td>
+              </tr>
+            `;
+          })
+          .join('');
+      }
+
+      async function loadSubmissions() {
+        rows = await fetchTeacherSubmissions(accessToken, APP_CONFIG.lessonId);
+        listCard.hidden = false;
+        renderTable();
+      }
+
+      if (!isSupabaseConfigured()) {
+        modeDesc.textContent =
+          '현재 Supabase 미설정(로컬 데모 모드)입니다. 이 브라우저에서 제출한 테스트 기록을 바로 확인할 수 있습니다.';
+        document.getElementById('teacher-login-form').hidden = true;
+        loadSubmissions();
+      } else {
+        modeDesc.textContent =
+          'Supabase Authentication에 등록된 교사 계정으로 로그인하면 RLS 정책에 따라 학생 제출 기록을 안전하게 조회합니다.';
+      }
+
+      document.getElementById('teacher-login-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        authMsg.hidden = true;
+        try {
+          const auth = await teacherSignIn(
+            document.getElementById('teacher-email').value,
+            document.getElementById('teacher-pw').value
+          );
+          accessToken = auth.access_token;
+          authCard.hidden = true;
+          await loadSubmissions();
+        } catch (err) {
+          authMsg.hidden = false;
+          authMsg.className = 'submit-status is-error';
+          authMsg.textContent = err.message;
+        }
+      });
+
+      searchInput.addEventListener('input', renderTable);
+      document.getElementById('refresh-btn').addEventListener('click', loadSubmissions);
+
+      document.getElementById('export-csv-btn').addEventListener('click', () => {
+        const headers = ['차시ID', '학번', '이름', '제출횟수', '예측선택', '미션달성', '확인체크', '생각질문', '체류초', '최종제출시각'];
+        const csvLines = [headers.join(',')];
+        for (const r of rows) {
+          const s = summarizeRow(r);
+          const cols = [
+            r.lesson_id || APP_CONFIG.lessonId,
+            r.student_id,
+            r.student_name,
+            r.submit_count || 1,
+            s.pred,
+            s.missions,
+            s.checks,
+            s.reflection,
+            s.duration,
+            r.updated_at || '',
+          ].map((v) => `"${String(v ?? '').replace(/"/g, '""')}"`);
+          csvLines.push(cols.join(','));
+        }
+        // UTF-8 BOM 포함 (Excel 한글 호환)
+        const blob = new Blob(['\uFEFF' + csvLines.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${APP_CONFIG.lessonId}_submissions.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+      });
+    </script>
+  </body>
+</html>
