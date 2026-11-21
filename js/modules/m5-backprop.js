@@ -627,7 +627,23 @@ export function mountM5Module({ rootEl, store, onOpenSubmit }) {
   const slideTabsEl = rootEl.querySelector('#m5-slide-tabs');
   const slideTrackEl = rootEl.querySelector('#m5-slide-track');
   const slideViewportEl = rootEl.querySelector('#m5-slide-viewport');
+  const slideCards = Array.from(slideTrackEl.querySelectorAll('.slide-card'));
   const slideIndicatorEl = rootEl.querySelector('#m5-slide-indicator');
+
+  function syncSlideViewportHeight() {
+    const activeCard = slideCards[local.slideIdx];
+    if (!activeCard || !slideViewportEl) return;
+    const h = Math.ceil(activeCard.offsetHeight);
+    if (h > 0) slideViewportEl.style.height = `${h}px`;
+  }
+
+  let slideResizeObserver = null;
+  if (typeof ResizeObserver !== 'undefined') {
+    slideResizeObserver = new ResizeObserver(() => {
+      syncSlideViewportHeight();
+    });
+    slideCards.forEach((card) => slideResizeObserver.observe(card));
+  }
   const prevSlideBtn = rootEl.querySelector('#m5-prev-slide');
   const nextSlideBtn = rootEl.querySelector('#m5-next-slide');
 
@@ -1086,8 +1102,9 @@ export function mountM5Module({ rootEl, store, onOpenSubmit }) {
     renderInspector();
     renderKeywordBar();
 
-    // 슬라이드 트랙 위치 이동
+    // 슬라이드 트랙 위치 이동 & 현재 슬라이드 높이에 맞춰 뷰포트 자동 축소/확장 (불필요한 여백 제거)
     slideTrackEl.style.transform = `translateX(-${local.slideIdx * 100}%)`;
+    requestAnimationFrame(syncSlideViewportHeight);
     slideIndicatorEl.textContent = `${local.slideIdx + 1} / ${SLIDE_META.length}`;
     prevSlideBtn.disabled = local.slideIdx === 0;
     nextSlideBtn.disabled = local.slideIdx === SLIDE_META.length - 1;
@@ -1415,6 +1432,7 @@ export function mountM5Module({ rootEl, store, onOpenSubmit }) {
   syncSlidersFromLocal();
   renderAll();
   renderMissionsAndCompare();
+  syncSlideViewportHeight();
 
   return {
     setPresentationMode(enabled) {
@@ -1423,6 +1441,7 @@ export function mountM5Module({ rootEl, store, onOpenSubmit }) {
     },
     destroy() {
       stopLiveTraining();
+      if (slideResizeObserver) slideResizeObserver.disconnect();
       destroyEntropy();
       neuralCanvas.destroy();
       window.removeEventListener('keydown', onGlobalKeyDown);

@@ -548,7 +548,7 @@ textarea:focus-visible {
 .arena-section {
   position: relative;
   z-index: 2;
-  padding: 14px 0 64px;
+  padding: 14px 0 20px;
 }
 
 .arena-container {
@@ -1152,6 +1152,7 @@ textarea:focus-visible {
   width: 100%;
   overflow: hidden;
   border-radius: var(--radius);
+  transition: height 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .slide-track {
