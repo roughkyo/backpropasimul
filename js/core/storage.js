@@ -226,14 +226,18 @@ export class LearningStore {
 
     // 실제 Supabase RPC 호출 (외부 SDK 없이 브라우저 내장 fetch 사용)
     const baseUrl = APP_CONFIG.supabaseUrl.replace(/\/+$/, '');
+    const key = APP_CONFIG.supabaseAnonKey.trim();
+    const headers = {
+      'Content-Type': 'application/json',
+      apikey: key,
+    };
+    if (!key.startsWith('sb_')) {
+      headers.Authorization = `Bearer ${key}`;
+    }
     try {
       const res = await fetch(`${baseUrl}/rest/v1/rpc/submit_learning_log`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          apikey: APP_CONFIG.supabaseAnonKey,
-          Authorization: `Bearer ${APP_CONFIG.supabaseAnonKey}`,
-        },
+        headers,
         body: JSON.stringify({
           p_lesson_id: APP_CONFIG.lessonId,
           p_student_id: cleanId,

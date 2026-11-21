@@ -34,7 +34,7 @@
 - 교사는 `teacher.html`(또는 Supabase 대시보드)을 통해 **학생별 예측 선택, 미션 달성 여부, 확인 퀴즈 정답/시도 횟수, 생각 질문 서술, 체류 시간**을 실시간으로 모아 보고 **UTF-8 CSV 파일**로 내려받아 형성평가 및 수업 피드백에 활용할 수 있습니다.
 
 ### ③ 정적 웹 환경에서의 개인정보 보호 및 타인 학번 도용 방지 (RLS + `pgcrypto` 해시)
-- 정적 웹페이지에는 Supabase `anon key`가 브라우저 코드에 포함됩니다. 만약 일반 테이블에 `SELECT`나 `UPDATE` 권한을 열어 두면 다른 학생의 제출 내용을 열람하거나 타인의 학번으로 기록을 덮어쓸 위험이 있습니다.
+- 정적 웹페이지에는 Supabase Publishable Key(`sb_publishable_...` 또는 `anon key`)가 브라우저 코드에 포함됩니다. 만약 일반 테이블에 `SELECT`나 `UPDATE` 권한을 열어 두면 다른 학생의 제출 내용을 열람하거나 타인의 학번으로 기록을 덮어쓸 위험이 있습니다.
 - 이를 방지하기 위해 **`learning_submissions` 테이블에 RLS(Row Level Security)를 활성화하여 익명(`anon`) 사용자의 직접 `SELECT / INSERT / UPDATE / DELETE`를 전면 차단**했습니다.
 - 학생 제출은 오직 `SECURITY DEFINER` 권한의 **PostgreSQL RPC 함수(`submit_learning_log`)**를 통해서만 수행되며, 비밀번호는 평문으로 저장하지 않고 DB 내부의 **`pgcrypto`(`crypt` + `gen_salt('bf')`) bcrypt 해시**로 암호화하여 저장·검증합니다. 같은 학번으로 재제출할 때는 처음 입력한 비밀번호와 일치해야만 갱신됩니다.
 

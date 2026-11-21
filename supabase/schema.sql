@@ -40,6 +40,9 @@ create policy "Teachers (authenticated) can read submissions"
   to authenticated
   using (true);
 
+revoke all on table public.learning_submissions from public, anon;
+grant select on table public.learning_submissions to authenticated;
+
 -- 4. 학생 제출 전용 RPC 함수 (SECURITY DEFINER)
 -- 학생은 회원가입 없이 학번 + 이름 + 비밀번호만 입력해 제출합니다.
 -- 동일 (lesson_id, student_id) 재제출 시 비밀번호 해시가 일치할 때만 갱신합니다.
