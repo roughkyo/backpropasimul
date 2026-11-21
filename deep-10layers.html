@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>심화 실험실 — 은닉층 10개(총 12층) 딥러닝 역전파 시뮬레이션</title>
+    <link rel="stylesheet" href="./css/style.css" />
+  </head>
+  <body>
+    <div class="scroll-progress-track" aria-hidden="true">
+      <div class="scroll-progress-bar" id="scroll-progress-bar"></div>
+    </div>
+
+    <header class="app-header">
+      <div class="header-left">
+        <a href="#deep-hero" class="brand-dot" aria-label="맨 위로"></a>
+        <h1 class="app-title">심화 실험실 — 은닉층 10개 딥러닝 역전파</h1>
+        <span class="progress-badge num" id="deep-header-badge">10은닉층 · 0회 수정</span>
+      </div>
+      <div class="header-right">
+        <div class="theme-switch" role="group" aria-label="화면 테마 선택">
+          <button type="button" class="theme-opt is-active" data-set-theme="light">화이트</button>
+          <button type="button" class="theme-opt" data-set-theme="dark">다크</button>
+        </div>
+        <a href="./index.html" class="btn btn-ghost btn-sm">← 3층 기본 시뮬레이션</a>
+      </div>
+    </header>
+
+    <main id="deep-app-root"></main>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <script type="module">
+      import { mountDeep10Layers } from './js/modules/deep-10layers.js';
+      import { showToast } from './js/core/ui.js';
+
+      const themeBtns = document.querySelectorAll('[data-set-theme]');
+      const badgeEl = document.getElementById('deep-header-badge');
+      const scrollBarEl = document.getElementById('scroll-progress-bar');
+
+      function applyTheme(theme) {
+        const mode = theme === 'dark' ? 'dark' : 'light';
+        document.documentElement.dataset.theme = mode;
+        themeBtns.forEach((btn) => {
+          btn.classList.toggle('is-active', btn.dataset.setTheme === mode);
+        });
+        try {
+          window.localStorage.setItem('sim_theme_pref_v2', mode);
+        } catch {
+          // ignore
+        }
+      }
+
+      try {
+        const saved = window.localStorage.getItem('sim_theme_pref_v2');
+        applyTheme(saved || 'light');
+      } catch {
+        applyTheme('light');
+      }
+
+      themeBtns.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          applyTheme(btn.dataset.setTheme);
+          showToast(
+            btn.dataset.setTheme === 'light' ? '화이트 모드로 전환했습니다.' : '다크 모드로 전환했습니다.',
+            'info'
+          );
+        });
+      });
+
+      function updateScrollProgress() {
+        if (!scrollBarEl) return;
+        const maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+        const pct = Math.min(100, Math.max(0, (window.scrollY / maxScroll) * 100));
+        scrollBarEl.style.width = `${pct.toFixed(1)}%`;
+      }
+      window.addEventListener('scroll', updateScrollProgress, { passive: true });
+      updateScrollProgress();
+
+      mountDeep10Layers({
+        rootEl: document.getElementById('deep-app-root'),
+        onStatsChange({ numHiddenLayers, activation, appliedUpdates, eTotal }) {
+          if (!badgeEl) return;
+          badgeEl.textContent = `${numHiddenLayers}은닉층 (${activation.toUpperCase()}) · ${appliedUpdates}회 · E=${eTotal.toFixed(4)}`;
+        },
+      });
+    </script>
+  </body>
+</html>

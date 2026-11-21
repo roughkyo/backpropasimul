@@ -30,6 +30,39 @@
 
     <main id="app-root"></main>
 
+    <!-- 심화 확장: 은닉층 10개(총 12층) 딥러닝 역전파 시뮬레이션 (새 탭 열기) -->
+    <section class="deep-expand-section" aria-label="은닉층 10개 심화 확장 시뮬레이션">
+      <div class="deep-expand-banner glass-panel">
+        <div class="deep-expand-copy">
+          <div class="hero-eyebrow-row">
+            <span class="hero-pill-badge">심화 확장 · 은닉층 10개 (총 12층 · 44개 가중치)</span>
+            <span class="kw-tag is-back">#기울기소실</span>
+            <span class="kw-tag" style="color:var(--success);border-color:rgba(16,185,129,0.4)">#ReLU부활</span>
+          </div>
+          <h2 class="deep-expand-title">
+            은닉층을 <span class="text-fwd">10개</span>로 깊게 쌓으면 역전파는 어떻게 달라질까?
+          </h2>
+          <p class="deep-expand-desc">
+            지금 본 3층 원리 그대로 <strong>12층 신경망 전체를 확대·축소·드래그·돋보기</strong>로 탐험하고,
+            <strong>Sigmoid 기울기 소실</strong>과 <strong>ReLU 신호 보존</strong>을 실시간 막대 차트로 비교해 보세요.
+          </p>
+        </div>
+
+        <div class="deep-expand-action">
+          <a
+            href="./deep-10layers.html"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="btn btn-primary deep-launch-btn"
+            id="open-deep-10layers-btn"
+          >
+            은닉층 10개 심화 시뮬레이션 열기 (새 탭) ↗
+          </a>
+          <span class="deep-expand-hint">휠 확대/축소 · 미니맵 이동 · Z 돋보기 지원</span>
+        </div>
+      </div>
+    </section>
+
     <!-- 학생 작업 기록 제출 모달 (학번 · 이름 · 비밀번호) -->
     <div class="modal-backdrop" id="submit-modal-backdrop" hidden>
       <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="submit-modal-title">

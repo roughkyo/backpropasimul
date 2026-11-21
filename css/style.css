@@ -1864,3 +1864,375 @@ textarea:focus-visible {
 .is-flash {
   animation: flashHighlight 0.35s ease-out;
 }
+
+/* ==========================================================================
+   심화 확장: 하단 10-은닉층 연결 배너 & deep-10layers.html 전용 컴포넌트
+   ========================================================================== */
+.deep-expand-section {
+  position: relative;
+  z-index: 2;
+  width: 96vw;
+  max-width: 1760px;
+  margin: 0 auto 48px;
+}
+
+.deep-expand-banner {
+  padding: 24px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+  border: 1.5px solid var(--fwd-solid);
+}
+
+.deep-expand-copy {
+  flex: 1 1 520px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.deep-expand-title {
+  margin: 0;
+  font-size: clamp(1.24rem, 2vw, 1.62rem);
+  font-weight: 900;
+  letter-spacing: -0.025em;
+  line-height: 1.3;
+  color: var(--text);
+}
+
+.deep-expand-desc {
+  margin: 0;
+  font-size: 0.96rem;
+  color: var(--text-muted);
+  max-width: 780px;
+}
+
+.deep-expand-desc strong {
+  color: var(--text);
+}
+
+.deep-expand-action {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 7px;
+  flex-shrink: 0;
+}
+
+.deep-launch-btn {
+  padding: 14px 24px;
+  font-size: 1rem;
+  font-weight: 800;
+  border-radius: 14px;
+}
+
+.deep-expand-hint {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-dim);
+}
+
+@media (max-width: 860px) {
+  .deep-expand-action {
+    align-items: flex-start;
+    width: 100%;
+  }
+}
+
+/* deep-10layers.html 4칸 키워드 바 & 대형 캔버스 */
+.deep-kw-bar {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+@media (max-width: 920px) {
+  .deep-kw-bar {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.activation-switch {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+
+.camera-focus-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 8px 12px;
+  border-radius: 13px;
+  background: var(--neu-bg);
+  box-shadow: var(--neu-inset);
+  border: 1px solid var(--border);
+}
+
+.camera-presets {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.layer-jump-chip {
+  padding: 6px 12px;
+  border-radius: 9px;
+  border: 1px solid var(--glass-border);
+  background: var(--surface-solid);
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 0.83rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.layer-jump-chip:hover {
+  color: var(--text);
+  border-color: var(--fwd);
+  transform: translateY(-1px);
+}
+.layer-jump-chip.is-active {
+  background: var(--btn-primary-bg);
+  color: #ffffff;
+  border-color: transparent;
+  box-shadow: var(--btn-primary-shadow);
+}
+
+#deep-neural-canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  min-height: 380px;
+}
+
+.arena-container.is-theater #deep-neural-canvas {
+  min-height: 530px;
+}
+
+/* 층별 기울기 감쇠 이퀄라이저 차트 + 라이브 메트릭 */
+.grad-dashboard {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(0, 0.85fr);
+  gap: 14px;
+  align-items: stretch;
+}
+@media (max-width: 1060px) {
+  .grad-dashboard {
+    grid-template-columns: 1fr;
+  }
+}
+
+.grad-chart-panel {
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.grad-chart-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.grad-status-callout {
+  font-size: 0.92rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.grad-ratio-pill {
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--back-soft);
+  color: var(--back);
+  border: 1px solid var(--back-solid);
+  font-size: 0.82rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.grad-bars-grid {
+  display: grid;
+  gap: 8px;
+  align-items: end;
+}
+
+.grad-bar-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 4px;
+  border-radius: 11px;
+  border: 1px solid var(--border);
+  background: var(--surface-subtle);
+  color: var(--text);
+  font-family: inherit;
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+.grad-bar-col:hover {
+  transform: translateY(-3px);
+  border-color: var(--fwd);
+  background: var(--fwd-soft);
+}
+
+.grad-bar-pct {
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
+.grad-bar-track {
+  width: 22px;
+  height: 78px;
+  border-radius: 999px;
+  background: var(--neu-bg);
+  box-shadow: var(--neu-inset);
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+  padding: 2px;
+}
+
+.grad-bar-fill {
+  width: 100%;
+  border-radius: 999px;
+  transition: height 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.grad-bar-fill.is-strong {
+  background: linear-gradient(180deg, #fb923c, #ea580c);
+}
+.grad-bar-fill.is-relu {
+  background: linear-gradient(180deg, #34d399, #059669);
+}
+.grad-bar-fill.is-vanish {
+  background: linear-gradient(180deg, #94a3b8, #64748b);
+  opacity: 0.55;
+}
+
+.grad-bar-lbl {
+  font-size: 0.78rem;
+  font-weight: 900;
+  color: var(--text);
+}
+
+.grad-bar-conn {
+  font-size: 0.67rem;
+  font-weight: 700;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
+.deep-live-metrics {
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+#deep-sparkline-svg {
+  width: 100%;
+  height: 44px;
+  display: block;
+}
+
+.deep-compare-mini {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 10px 12px;
+  border-radius: 11px;
+  background: var(--surface-subtle);
+  border: 1px solid var(--border);
+}
+
+.deep-mini-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.84rem;
+  color: var(--text-muted);
+}
+
+/* 하단 2열 실험실 & 비교 카드 */
+.deep-bottom-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  align-items: stretch;
+}
+@media (max-width: 980px) {
+  .deep-bottom-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.deep-card-pad {
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.deep-sub-note {
+  margin: 4px 0 0;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+}
+
+.deep-preset-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.deep-insight-cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+@media (max-width: 640px) {
+  .deep-insight-cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+.deep-insight-box {
+  padding: 14px 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.deep-insight-box.is-warn {
+  border-color: rgba(234, 88, 12, 0.38);
+}
+.deep-insight-box.is-good {
+  border-color: rgba(16, 185, 129, 0.42);
+}
+.deep-insight-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.deep-insight-box p {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  line-height: 1.55;
+}
+.deep-insight-box strong {
+  color: var(--text);
+}
